@@ -16,23 +16,27 @@ def get_products_list(filename):
         product_categorized[product['Категория']].append(product)
     return product_categorized
 
-load_dotenv()
-product_catalog_path = os.getenv('CATALOG_PATH', default='product_catalog.xlsx')
-print(product_catalog_path)
-env = Environment(
-    loader=FileSystemLoader('.'),
-    autoescape=select_autoescape(['html', 'xml'])
-)
-template = env.get_template('template.html')
+def main():
+    load_dotenv()
+    product_catalog_path = os.getenv('CATALOG_PATH', default='product_catalog.xlsx')
+    print(product_catalog_path)
+    env = Environment(
+        loader=FileSystemLoader('.'),
+        autoescape=select_autoescape(['html', 'xml'])
+    )
+    template = env.get_template('template.html')
 
-winery_age = datetime.datetime.now().year - WINERY_CREATED_YEAR
-rendered_page = template.render(
-    winery_age = winery_age,
-    products_list = get_products_list(product_catalog_path)
-)
+    winery_age = datetime.datetime.now().year - WINERY_CREATED_YEAR
+    rendered_page = template.render(
+        winery_age = winery_age,
+        products_list = get_products_list(product_catalog_path)
+    )
 
-with open('index.html', 'w', encoding="utf8") as file:
-    file.write(rendered_page)
+    with open('index.html', 'w', encoding="utf8") as file:
+        file.write(rendered_page)
 
-server = HTTPServer(('0.0.0.0', 8000), SimpleHTTPRequestHandler)
-server.serve_forever()
+    server = HTTPServer(('0.0.0.0', 8000), SimpleHTTPRequestHandler)
+    server.serve_forever()
+    
+if __name__ == '__main__':
+    main()
