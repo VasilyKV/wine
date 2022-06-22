@@ -9,7 +9,7 @@ from http.server import HTTPServer, SimpleHTTPRequestHandler
 
 WINERY_CREATED_YEAR = 1920
 
-def get_products_list(filename):
+def get_products(filename):
     products = pandas.read_excel(filename, sheet_name='Лист1',keep_default_na=False).to_dict('records')
     product_categorized = collections.defaultdict(list)
     for product in products:
@@ -19,7 +19,6 @@ def get_products_list(filename):
 def main():
     load_dotenv()
     product_catalog_path = os.getenv('CATALOG_PATH', default='product_catalog.xlsx')
-    print(product_catalog_path)
     env = Environment(
         loader=FileSystemLoader('.'),
         autoescape=select_autoescape(['html', 'xml'])
@@ -29,7 +28,7 @@ def main():
     winery_age = datetime.datetime.now().year - WINERY_CREATED_YEAR
     rendered_page = template.render(
         winery_age = winery_age,
-        products_list = get_products_list(product_catalog_path)
+        products = get_products(product_catalog_path)
     )
 
     with open('index.html', 'w', encoding="utf8") as file:
@@ -37,6 +36,6 @@ def main():
 
     server = HTTPServer(('0.0.0.0', 8000), SimpleHTTPRequestHandler)
     server.serve_forever()
-    
+
 if __name__ == '__main__':
     main()
